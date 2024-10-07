@@ -14,13 +14,15 @@ namespace Web.Controllers
     {
         private readonly IRepository<Product> _products;
         private readonly IRepository<Category> _categories;
+        private readonly IRepository<ProductImage> _images;
         private readonly ILogger<AdminController> _logger;
 
-        public AdminController(IRepository<Product> products, ILogger<AdminController> logger, IRepository<Category> categories)
+        public AdminController(IRepository<Product> products, ILogger<AdminController> logger, IRepository<Category> categories, IRepository<ProductImage> images)
         {
             _products = products;
             _logger = logger;
             _categories = categories;
+            _images = images;
         }
 
         public async Task<IActionResult> Index(CancellationToken cancellationToken, string activeTab = "Products")
@@ -40,6 +42,34 @@ namespace Web.Controllers
             var categories = await _categories.GetListAsync(canecllationToken: cancellationToken);
             ViewBag.Categories = new SelectList(categories, "Id", "Name");
             return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create(Product model, IFormFile Image, CancellationToken cancellationToken)
+        {
+            var image = new ProductImage
+            {
+                Id = Guid.NewGuid(),
+                Extension = Image.FileName.Split('.').LastOrDefault(),
+            };
+
+            using var memStream = new MemoryStream();
+            await Image.CopyToAsync(memStream, cancellationToken);
+            image.Bytes = memStream.ToArray();
+
+            if (model.Price <= 0)
+                model.Price = 0;
+            // Получаем выбранные категории по их идентификаторам
+            var selectedCategories = await _categories.GetListAsync(q => q.Where(c => model.CategoriesIds.Contains(c.Id)), canecllationToken: cancellationToken);
+            model.CategoriesIds = [.. selectedCategories.Select(x => x.Id)];
+            model.ImageId = image.Id;
+
+            await _images.AddAsync(image, cancellationToken);
+            await _products.AddAsync(model, cancellationToken);
+            await _products.SaveChangesAsync(cancellationToken);
+            await _images.SaveChangesAsync(cancellationToken);
+            ViewBag.Categories = new SelectList(await _categories.GetListAsync(), "Id", "Name", model.CategoriesIds);
+            return RedirectToAction("Index");
         }
 
         [HttpPost]
