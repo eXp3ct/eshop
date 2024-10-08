@@ -1,5 +1,6 @@
 ﻿@model ProductFilterViewModel
 @using Microsoft.AspNetCore.Mvc.Rendering
+@inject ILogger<Index> _logger;
 @{
     ViewData["Title"] = "Home Page";
 }
@@ -38,6 +39,9 @@
                                     }
                                 </small>
                             </div>
+                            @{
+                                _logger.LogInformation("---|{categories}|---", item.Categories.Count);
+                            }
                         </div>
                     </div>
                 </a>
