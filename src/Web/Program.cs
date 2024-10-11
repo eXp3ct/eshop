@@ -74,4 +74,6 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 app.MapRazorPages();
 
+app.UseRequestLocalization("ru");
+
 app.Run();
