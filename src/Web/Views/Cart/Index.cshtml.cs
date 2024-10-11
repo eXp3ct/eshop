@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace Web.Views.Home
+namespace Web.Views.Cart
 {
-    public class ProductModel : PageModel
+    public class IndexModel : PageModel
     {
         public void OnGet()
         {

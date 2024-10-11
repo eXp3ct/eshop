@@ -32,6 +32,14 @@ builder.Services.AddScoped<IRepository<Category>, BaseRepository<Category>>();
 
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
@@ -56,7 +64,7 @@ catch (Exception ex)
     logger.LogError(ex, "An error occurred while seeding roles and admin user.");
 }
 app.UseStaticFiles();
-
+app.UseSession();
 app.UseRouting();
 
 app.UseAuthorization();
