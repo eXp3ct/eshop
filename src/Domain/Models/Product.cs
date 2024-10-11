@@ -7,10 +7,10 @@
         public string? Article { get; set; }
         public string? Description { get; set; }
         public decimal Price { get; set; }
-        public List<Guid> CategoriesIds { get; set; }
+        public IList<Guid> CategoriesIds { get; set; }
         public Guid ImageId { get; set; }
 
-        public virtual List<Category> Categories { get; set; }
+        public virtual IReadOnlyCollection<Category> Categories { get; set; }
         public virtual ProductImage Image { get; set; }
     }
 }

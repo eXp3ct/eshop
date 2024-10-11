@@ -13,7 +13,8 @@ namespace Web.Data.Configurations
                 .WithOne(x => x.Product)
                 .HasForeignKey<Product>(x => x.ImageId);
             builder.HasMany(x => x.Categories)
-                .WithMany(x => x.Products);
+                .WithMany(x => x.Products)
+                .UsingEntity(j => j.ToTable("ProductCategories"));
 
         }
     }
