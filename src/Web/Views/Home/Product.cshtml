@@ -1,4 +1,5 @@
 ﻿@using Domain.Models
+@using System.Globalization
 @model Product
 
 <div class="container mt-5">
@@ -10,7 +11,7 @@
             <h2>@Model.Name</h2>
             <p>@Model.Description</p>
             <p><strong>Article:</strong> @Model.Article</p>
-            <p><strong>Price:</strong> @Model.Price.ToString("C")</p>
+            <p><strong>Price:</strong> @Model.Price.ToString("C", CultureInfo.GetCultureInfo("ru-RU"))</p>
             <p>
                 <strong>Categories:</strong>
                 @foreach (var category in Model.Categories)
