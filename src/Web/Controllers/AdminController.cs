@@ -74,11 +74,62 @@ namespace Web.Controllers
             return RedirectToAction("Index", "Admin");
         }
 
+        public async Task<IActionResult> Edit(Guid id, CancellationToken cancellationToken)
+        {
+            var product = await _products.GetByIdAsync(id, q => q.Include(x => x.Image).Include(x => x.Categories), cancellationToken);
+
+            if (product is null)
+                return NotFound();
+
+            var categories = await _categories.GetListAsync(canecllationToken: cancellationToken);
+            ViewBag.Categories = new SelectList(categories, "Id", "Name", product.Categories.Select(x => x.Id));
+
+            return View(product);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(Product newProduct, IFormFile Image, CancellationToken cancellationToken)
+        {
+            var product = await _products.GetByIdAsync(newProduct.Id, q => q.Include(x => x.Image).Include(x => x.Categories), cancellationToken);
+
+            if (product is null)
+                return NotFound();
+
+            var image = new ProductImage
+            {
+                Id = Guid.NewGuid(),
+                Extension = Image.FileName.Split('.').LastOrDefault(),
+            };
+
+            using var memStream = new MemoryStream();
+            await Image.CopyToAsync(memStream, cancellationToken);
+            image.Bytes = memStream.ToArray();
+
+
+            // Получаем выбранные категории по их идентификаторам
+            var selectedCategories = await _categories.GetListAsync(q => q.Where(c => newProduct.CategoriesIds.Contains(c.Id)), cancellationToken);
+            _logger.LogWarning("Selected categories {categories}", selectedCategories.Count());
+
+            product.Categories = [.. selectedCategories];
+            product.Image = image;
+            product.Article = ArticleGenerator.GenerateArticle(selectedCategories.FirstOrDefault()!.Name);
+            product.Id = newProduct.Id;
+            product.Name = newProduct.Name;
+            product.Description = newProduct.Description;
+            product.Price = newProduct.Price;
+
+            await _images.AddAsync(image, cancellationToken);
+            await _images.SaveChangesAsync(cancellationToken);
+            await _products.SaveChangesAsync(cancellationToken);
+
+            return RedirectToAction("Index", "Admin");
+        }
+
         public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
         {
             await _products.DeleteAsync(id, cancellationToken);
 
-            await _products.SaveChangesAsync();
+            await _products.SaveChangesAsync(cancellationToken);
 
             return RedirectToAction("Index");
         }
