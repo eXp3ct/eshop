@@ -61,6 +61,7 @@ namespace Web.Controllers
                 model.Price = 0;
             // Получаем выбранные категории по их идентификаторам
             var selectedCategories = await _categories.GetListAsync(q => q.Where(c => model.CategoriesIds.Contains(c.Id)), canecllationToken: cancellationToken);
+            _logger.LogWarning("Selected categories {categories}", selectedCategories.Count());
             model.CategoriesIds = [.. selectedCategories.Select(x => x.Id)];
             model.ImageId = image.Id;
 
@@ -68,7 +69,15 @@ namespace Web.Controllers
             await _products.AddAsync(model, cancellationToken);
             await _products.SaveChangesAsync(cancellationToken);
             await _images.SaveChangesAsync(cancellationToken);
-            ViewBag.Categories = new SelectList(await _categories.GetListAsync(), "Id", "Name", model.CategoriesIds);
+            return RedirectToAction("Index", "Admin");
+        }
+
+        public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
+        {
+            await _products.DeleteAsync(id, cancellationToken);
+
+            await _products.SaveChangesAsync();
+
             return RedirectToAction("Index");
         }
 

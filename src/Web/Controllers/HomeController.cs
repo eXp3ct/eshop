@@ -26,14 +26,20 @@ namespace Web.Controllers
             var allCategories = await _categories.GetListAsync(canecllationToken: cancellationToken);
             ViewBag.Categories = new MultiSelectList(allCategories, "Id", "Name", model.SelectedCategoryIds);
 
-            var query = (await _product.GetListAsync(q => q.Include(x => x.Image).Include(x => x.Categories)))!.AsQueryable();
+            var query = (await _product.GetListAsync(q => q.Include(x => x.Image).Include(x => x.Categories), cancellationToken))!.AsQueryable();
 
-            if(model.SelectedCategoryIds != null && model.SelectedCategoryIds.Any())
+
+            if(model.SelectedCategoryIds != null && model.SelectedCategoryIds.Count != 0)
             {
-                query = query.Where(item => item.Categories.Any(c => model.SelectedCategoryIds.Contains(c.Id)));
+                query = query.Where(item => item.CategoriesIds.Any(c => model.SelectedCategoryIds.Contains(c)));
             }
 
-            model.Items = query.ToList();
+            model.Items = [.. query];
+
+            //model.Items.ForEach(async item =>
+            //{
+            //    item.Categories = [.. await _categories.GetListAsync(q => q.Where(c => item.CategoriesIds.Contains(c.Id)))];
+            //});
 
             return View(model);
         }

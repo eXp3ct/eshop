@@ -40,7 +40,7 @@
                     @foreach (var category in (SelectList)ViewBag.Categories)
                     {
                         <div class="form-check">
-                            <input type="checkbox" class="form-check-input" name="CategoryIds" value="@category.Value" id="category_@category.Value" />
+                            <input type="checkbox" class="form-check-input" name="CategoriesIds" value="@category.Value" id="category_@category.Value" />
                             <label class="form-check-label" for="category_@category.Value">@category.Text</label>
                         </div>
                     }

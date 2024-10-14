@@ -7,7 +7,7 @@
         public Guid? ParentCategoryId { get; set; }
         public IList<Guid>? ProductsIds { get; set; } 
 
-        public virtual IList<Product>? Products { get; set; }
+        public virtual IReadOnlyCollection<Product>? Products { get; set; }
         public virtual Category? ParentCategory { get; set; }
     }
 }
