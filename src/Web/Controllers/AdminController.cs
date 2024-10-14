@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Threading;
 using Web.Data.Interfaces;
 using Web.Models;
+using Web.Utilities;
 
 namespace Web.Controllers
 {
@@ -57,13 +58,14 @@ namespace Web.Controllers
             await Image.CopyToAsync(memStream, cancellationToken);
             image.Bytes = memStream.ToArray();
 
-            if (model.Price <= 0)
-                model.Price = 0;
+            
             // Получаем выбранные категории по их идентификаторам
             var selectedCategories = await _categories.GetListAsync(q => q.Where(c => model.CategoriesIds.Contains(c.Id)), canecllationToken: cancellationToken);
             _logger.LogWarning("Selected categories {categories}", selectedCategories.Count());
+
             model.Categories = [.. selectedCategories];
             model.Image = image;
+            model.Article = ArticleGenerator.GenerateArticle(selectedCategories.FirstOrDefault()!.Name);
 
             await _images.AddAsync(image, cancellationToken);
             await _products.AddAsync(model, cancellationToken);
@@ -114,5 +116,7 @@ namespace Web.Controllers
             
             return RedirectToAction("Index", new { activeTab = "Categories" });
         }
+
+
     }
 }
