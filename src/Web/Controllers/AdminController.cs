@@ -62,8 +62,8 @@ namespace Web.Controllers
             // Получаем выбранные категории по их идентификаторам
             var selectedCategories = await _categories.GetListAsync(q => q.Where(c => model.CategoriesIds.Contains(c.Id)), canecllationToken: cancellationToken);
             _logger.LogWarning("Selected categories {categories}", selectedCategories.Count());
-            model.CategoriesIds = [.. selectedCategories.Select(x => x.Id)];
-            model.ImageId = image.Id;
+            model.Categories = [.. selectedCategories];
+            model.Image = image;
 
             await _images.AddAsync(image, cancellationToken);
             await _products.AddAsync(model, cancellationToken);

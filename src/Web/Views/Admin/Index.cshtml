@@ -65,7 +65,9 @@ else if (Model.ActiveTab == "Categories")
             </tr>
         </thead>
         <tbody>
-            @await RenderCategoryTree(Model.Categories, null, 0, counter)
+            @{
+                await RenderCategoryTree(Model.Categories, null, 0, counter);
+            }
 
             <!-- Строка для добавления новой категории -->
             <tr id="new-category-row">

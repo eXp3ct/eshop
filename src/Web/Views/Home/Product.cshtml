@@ -1,0 +1,23 @@
+﻿@using Domain.Models
+@model Product
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-6">
+            <img src="data:image;base64,@System.Convert.ToBase64String(Model.Image.Bytes)" class="img-fluid" alt="@Model.Name" />
+        </div>
+        <div class="col-md-6">
+            <h2>@Model.Name</h2>
+            <p>@Model.Description</p>
+            <p><strong>Article:</strong> @Model.Article</p>
+            <p><strong>Price:</strong> @Model.Price.ToString("C")</p>
+            <p>
+                <strong>Categories:</strong>
+                @foreach (var category in Model.Categories)
+                {
+                    @($"{category.Name} ")
+                }
+            </p>
+        </div>
+    </div>
+</div>
