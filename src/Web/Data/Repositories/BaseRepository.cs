@@ -33,7 +33,7 @@ namespace Web.Data.Repositories
         {
             try
             {
-                var entityToDelete = await GetByIdAsync(id, canecllationToken)
+                var entityToDelete = await GetByIdAsync(id, canecllationToken: canecllationToken)
                     ?? throw new Exception($"{_typeName} not found in database");
 
                 var entry = Set.Remove(entityToDelete);
@@ -51,33 +51,57 @@ namespace Web.Data.Repositories
         }
 
 
-        public async Task<TEntity?> GetByIdAsync(Guid id, CancellationToken canecllationToken = default)
+        public async Task<TEntity?> GetByIdAsync(
+        Guid id,
+        Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null,
+        CancellationToken canecllationToken = default)
         {
             try
             {
-                var entity = await Set.FindAsync([id, canecllationToken], cancellationToken: canecllationToken)
+                IQueryable<TEntity> query = Set;
+
+                // Применяем Include, если он передан
+                if (include != null)
+                {
+                    query = include(query);
+                }
+
+                var entity = await query.FirstOrDefaultAsync(e => EF.Property<Guid>(e, "Id") == id, canecllationToken)
                     ?? throw new Exception($"Failed to find {_typeName} in database");
 
-                if (entity is null)
+                if (entity == null)
+                {
                     _logger.LogWarning("{typeName} not found in database", _typeName);
+                }
                 else
+                {
                     _logger.LogInformation("{typeName} found in database", _typeName);
+                }
 
                 return entity;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to find {typeName} in database", _typeName);
-
                 return null;
             }
         }
 
-        public async Task<IEnumerable<TEntity>?> GetListAsync(CancellationToken canecllationToken = default)
+        public async Task<IEnumerable<TEntity>?> GetListAsync(
+        Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null,
+        CancellationToken canecllationToken = default)
         {
             try
             {
-                var list = await Set.ToListAsync(cancellationToken: canecllationToken)
+                IQueryable<TEntity> query = Set;
+
+                // Применяем Include, если он передан
+                if (include != null)
+                {
+                    query = include(query);
+                }
+
+                var list = await query.ToListAsync(cancellationToken: canecllationToken)
                     ?? throw new Exception($"Failed to get list of {_typeName} from database");
 
                 _logger.LogInformation("Found {count} of {typeName} in database", list.Count, _typeName);
@@ -87,12 +111,23 @@ namespace Web.Data.Repositories
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to find {typeName} in database", _typeName);
-
                 return null;
             }
         }
 
-        public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default) => _context.SaveChangesAsync(cancellationToken);
+        public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                return await _context.SaveChangesAsync(cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occured while saving {typeName} in database", _typeName);
+
+                throw;
+            }
+        }
 
         private bool disposed = false;
 

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Web.Data.Contexts;
 
@@ -11,9 +12,11 @@ using Web.Data.Contexts;
 namespace Web.Migrations.AppDb
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241005123824_CategorySeeding")]
+    partial class CategorySeeding
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -43,6 +46,10 @@ namespace Web.Migrations.AppDb
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -62,31 +69,36 @@ namespace Web.Migrations.AppDb
                     b.HasData(
                         new
                         {
-                            Id = new Guid("8091fd41-67fb-47e7-b8fe-007156101f64"),
+                            Id = new Guid("d594553a-b10f-47f8-8441-3a51dd1904a7"),
+                            Description = "Компьютерные клавиатуры, игровые клавиатуры",
                             Name = "Клавиатуры",
-                            ParentCategoryId = new Guid("e14d324f-e80a-4ad9-b337-cf05621c0ba0")
+                            ParentCategoryId = new Guid("f68e9e8f-b487-48a8-be07-1ed67e67ecc1")
                         },
                         new
                         {
-                            Id = new Guid("9d092ec8-97b2-4961-9d19-28d7149bbece"),
+                            Id = new Guid("63962daf-d3c4-4fba-9d14-9579f24eca0f"),
+                            Description = "Беспроводные, игровые, офисные наушники",
                             Name = "Наушники",
-                            ParentCategoryId = new Guid("e14d324f-e80a-4ad9-b337-cf05621c0ba0")
+                            ParentCategoryId = new Guid("f68e9e8f-b487-48a8-be07-1ed67e67ecc1")
                         },
                         new
                         {
-                            Id = new Guid("e14d324f-e80a-4ad9-b337-cf05621c0ba0"),
+                            Id = new Guid("f68e9e8f-b487-48a8-be07-1ed67e67ecc1"),
+                            Description = "Компьютерная переферия для работы и игр",
                             Name = "Компьютерная переферия"
                         },
                         new
                         {
-                            Id = new Guid("f7325b0a-23ac-4d60-b624-f6004a58ae0e"),
+                            Id = new Guid("3a58148c-a581-4827-a25f-5d6805327cd7"),
+                            Description = "Различные комплектующие для сборки персонального компьютера",
                             Name = "Комплектующие пк"
                         },
                         new
                         {
-                            Id = new Guid("62f28ca9-a2e8-49d6-b215-11000ae6c713"),
+                            Id = new Guid("d0cd08bd-ede4-49de-b862-1163817341da"),
+                            Description = "Видеопроцессоры для компьютера",
                             Name = "Видеокарты",
-                            ParentCategoryId = new Guid("f7325b0a-23ac-4d60-b624-f6004a58ae0e")
+                            ParentCategoryId = new Guid("3a58148c-a581-4827-a25f-5d6805327cd7")
                         });
                 });
 

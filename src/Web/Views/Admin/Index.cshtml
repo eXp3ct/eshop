@@ -1,0 +1,169 @@
+﻿@using Domain.Models
+@model AdminPanelViewModel
+@{
+    ViewData["Title"] = "Admin Panel";
+}
+
+<h2>Admin Panel</h2>
+
+<div class="btn-group mb-4" role="group">
+    <a href="@Url.Action("Index", new { activeTab = "Products" })" class="btn @(Model.ActiveTab == "Products" ? "btn-primary" : "btn-secondary")">
+        Товар
+    </a>
+    <a href="@Url.Action("Index", new { activeTab = "Categories" })" class="btn @(Model.ActiveTab == "Categories" ? "btn-primary" : "btn-secondary")">
+        Категории
+    </a>
+</div>
+
+@if (Model.ActiveTab == "Products")
+{
+    <p>
+        <a href="@Url.Action("Create", "Admin")">Create New Product</a>
+    </p>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Article</th>
+                <th scope="col">Price</th>
+                <th scope="col">Edit</th>
+                <th scope="col">Delete</th>
+            </tr>
+        </thead>
+        @foreach (var item in Model.Products)
+        {
+            <tr>
+                <td>@(Model.Products.IndexOf(item) + 1)</td>
+                <td>@item.Name</td>
+                <td>@item.Article</td>
+                <td>@item.Price.ToString("C")</td>
+                <td>
+                    <a class="btn btn-primary" href="@Url.Action("Edit", "Admin", new { id = item.Id })">Edit</a>
+                </td>
+                <td>
+                    <form method="post" asp-action="Delete" asp-controller="Admin" asp-route-id="@item.Id">
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </table>
+}
+else if (Model.ActiveTab == "Categories")
+{
+    var counter = 1;
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Parent</th>
+                <th scope="col">Edit</th>
+                <th scope="col">Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+            @await RenderCategoryTree(Model.Categories, null, 0, counter)
+
+            <!-- Строка для добавления новой категории -->
+            <tr id="new-category-row">
+                <td>@(Model.Categories.Count + 1)</td>
+                <td>
+                    <input type="text" class="form-control" id="new-category-name" placeholder="Enter new category name" />
+                </td>
+                <td>
+                    <select class="form-select" id="parent-category-id">
+                        <option value="">No Parent</option>
+                        @foreach (var category in Model.Categories)
+                        {
+                            <option value="@category.Id">@category.Name</option>
+                        }
+                    </select>
+                </td>
+                <td>
+                    <button class="btn btn-success" onclick="createCategory()">Принять</button>
+                    <button class="btn btn-secondary" onclick="cancelNewCategory()">Отменить</button>
+                </td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+}
+
+@functions {
+    public async Task<int> RenderCategoryTree(IEnumerable<Category> categories, Guid? parentCategoryId, int level, int counter)
+    {
+        var subCategories = categories.Where(c => c.ParentCategoryId == parentCategoryId);
+
+        foreach (var category in subCategories)
+        {
+            <tr>
+                <td>@counter</td>
+                <td id="category-name-@category.Id" style="padding-left:@(level * 20)px;">
+                    @category.Name
+                </td>
+                <td>@category.ParentCategory?.Name</td>
+                <td>
+                    <button class="btn btn-primary" onclick="editCategory('@category.Id', '@category.Name')">Edit</button>
+                </td>
+                <td>
+                    <form method="post" asp-action="DeleteCategory" asp-controller="Admin" asp-route-id="@category.Id">
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+
+            counter++;
+
+            counter = await RenderCategoryTree(categories, category.Id, level + 1, counter);
+        }
+
+        return counter;
+    }
+}
+
+@section Scripts {
+    <script>
+        function editCategory(id, name) {
+            const cell = document.getElementById(`category-name-${id}`);
+            const originalContent = cell.innerHTML;
+
+            cell.innerHTML = `
+                <input type="text" class="form-control" id="edit-category-name-${id}" value="${name}" />
+                <button class="btn btn-success mt-1" onclick="saveEditCategory('${id}')">Принять</button>
+                <button class="btn btn-secondary mt-1" onclick="cancelEditCategory('${id}', '${originalContent}')">Отменить</button>
+            `;
+        }
+
+        function cancelEditCategory(id, originalContent) {
+            const cell = document.getElementById(`category-name-${id}`);
+            cell.innerHTML = originalContent;
+        }
+
+        function saveEditCategory(id) {
+            const newName = document.getElementById(`edit-category-name-${id}`).value;
+            const url = `@Url.Action("EditCategory", "Admin")`;
+
+            $.post(url, { id: id, newName: newName }, function (data) {
+                location.reload();
+            });
+        }
+
+        function createCategory() {
+            const name = document.getElementById('new-category-name').value;
+            const parentId = document.getElementById('parent-category-id').value;
+            const url = `@Url.Action("CreateCategory", "Admin")`;
+
+            $.post(url, { name: name, parentCategoryId: parentId }, function (data) {
+                location.reload();
+            });
+        }
+
+        function cancelNewCategory() {
+            document.getElementById('new-category-name').value = '';
+            document.getElementById('parent-category-id').value = '';
+        }
+    </script>
+}
