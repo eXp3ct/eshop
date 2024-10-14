@@ -47,6 +47,9 @@ namespace Web.Controllers
         {
             var product = await _product.GetByIdAsync(id, q => q.Include(x => x.Image).Include(x => x.Categories) ,cancellationToken);
 
+            if(product is null)
+                return NotFound();
+
             return View(product);
         }
 

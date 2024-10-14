@@ -1,0 +1,35 @@
+﻿@model CartViewModel
+
+<div class="container mt-4">
+    <h2>Корзина</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Товар</th>
+                <th>Цена</th>
+                <th>Количество</th>
+                <th>Итог</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Items)
+            {
+                <tr>
+                    <td>@item.ProductName</td>
+                    <td>@item.Price.ToString("C")</td>
+                    <td>
+                        <form asp-action="UpdateCart" asp-controller="Cart" method="post">
+                            <input type="hidden" name="productId" value="@item.ProductId" />
+                            <input type="number" name="quantity" value="@item.Quantity" class="form-control" style="width: 80px;" />
+                            <button type="submit" class="btn btn-primary d-inline">Изменить</button>
+                        </form>
+                    </td>
+                    <td>@item.TotalPrice.ToString("C")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <h4>Итоговая сумма: @Model.TotalAmount.ToString("C")</h4>
+    <button class="btn btn-success" disabled>Оплатить (Заглушка)</button>
+</div>
