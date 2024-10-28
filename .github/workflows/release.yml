@@ -1,0 +1,68 @@
+name: Build and Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.x'
+
+      - name: Build ASP.NET Core API и выполнить миграции
+        working-directory: src/Web
+        run: |
+          dotnet restore
+          dotnet publish -c Release -o ../../output/web
+
+      - name: Add Makefile to output
+        run: cp Makefile output/
+        
+      - name: Archive build artifacts
+        run: |
+          cd output
+          zip -r release.zip .
+
+      - name: Read version from file
+        id: get_version
+        run: echo "version=$(cat version.txt)" >> $GITHUB_ENV
+
+      - name: Read changelog
+        id: get_changelog
+        run: |
+          CHANGELOG=$(awk '/^## \[/{f=0} f; /^## \[/{f=1}' CHANGELOG.md)
+          echo "$CHANGELOG" > changelog.txt
+          echo "CHANGELOG<<EOF" >> $GITHUB_ENV
+          cat changelog.txt >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+        with:
+          tag_name: v${{ env.version }}
+          release_name: "Release v${{ env.version }}"
+          body: ${{ env.CHANGELOG }}  # Используем многострочный changelog
+          draft: false
+          prerelease: false
+
+      - name: Upload release assets
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./output/release.zip
+          asset_name: release.zip
+          asset_content_type: application/zip
