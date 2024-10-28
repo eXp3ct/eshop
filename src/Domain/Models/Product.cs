@@ -16,7 +16,7 @@ namespace Domain.Models
         public IList<Guid> CategoriesIds { get; set; }
         public Guid ImageId { get; set; }
 
-        public virtual IReadOnlyCollection<Category> Categories { get; set; }
+        public virtual IList<Category> Categories { get; set; }
         public virtual ProductImage Image { get; set; }
     }
 }

@@ -8,6 +8,8 @@ using Web.Data;
 using Web.Data.Contexts;
 using Web.Data.Interfaces;
 using Web.Data.Repositories;
+using Web.Services;
+using Web.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("AppUserDbContextConnection") ?? throw new InvalidOperationException("Connection string 'AppUserDbContextConnection' not found.");
@@ -31,6 +33,10 @@ builder.Services.AddScoped<IAppDbContext,  AppDbContext>();
 builder.Services.AddScoped<IRepository<Product>, BaseRepository<Product>>();
 builder.Services.AddScoped<IRepository<ProductImage>, BaseRepository<ProductImage>>();
 builder.Services.AddScoped<IRepository<Category>, BaseRepository<Category>>();
+builder.Services.AddScoped<IAdminService, AdminService>();
+builder.Services.AddScoped<IHomeService, HomeService>();
+builder.Services.AddScoped<ICartService, CartService>();
+
 
 builder.Services.AddControllersWithViews();
 

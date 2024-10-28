@@ -30,12 +30,12 @@
                             Цена: @item.Price.ToString("C", CultureInfo.GetCultureInfo("ru-RU"))
                         </p>
                         <p class="card-footer">
-                            <small class="text-muted">
+                            <span class="text-muted">
                                 @foreach (var category in item.Categories)
                                 {
                                     @($"{category.Name} ")
                                 }
-                            </small>
+                            </span>
                         </p>
                         <form asp-action="AddToCart" asp-controller="Cart" method="post">
                             <input type="hidden" name="productId" value="@item.Id" />
