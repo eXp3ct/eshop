@@ -18,7 +18,7 @@ jobs:
         with:
           dotnet-version: '8.x'
 
-      - name: Build ASP.NET Core API и выполнить миграции
+      - name: Build ASP.NET Core API
         working-directory: src/Web
         run: |
           dotnet restore
@@ -26,7 +26,7 @@ jobs:
 
       - name: Add Makefile to output
         run: cp Makefile output/
-        
+
       - name: Archive build artifacts
         run: |
           cd output

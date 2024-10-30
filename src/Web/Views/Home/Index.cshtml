@@ -38,9 +38,9 @@
                             </span>
                         </p>
                         <form asp-action="AddToCart" asp-controller="Cart" method="post">
-                            <input type="hidden" name="productId" value="@item.Id" />
-                            <input type="hidden" name="productName" value="@item.Name" />
-                            <input type="hidden" name="price" value="@item.Price" />
+                            <input type="hidden" name="Id" value="@item.Id" />
+                            <input type="hidden" name="Name" value="@item.Name" />
+                            <input type="hidden" name="Price" value="@item.Price" />
                             <button type="submit" class="btn btn-success">Добавить в корзину</button>
                         </form>
                     </div>

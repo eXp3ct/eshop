@@ -65,7 +65,7 @@ namespace Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateCategory(string name, Guid parentCategoryId, CancellationToken cancellationToken)
+        public async Task<IActionResult> CreateCategory(string name, Guid? parentCategoryId, CancellationToken cancellationToken)
         {
             return Json(new { success = await _adminService.CreateCategory(name, parentCategoryId, cancellationToken) });
         }

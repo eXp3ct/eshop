@@ -1,4 +1,5 @@
-﻿using Web.Models;
+﻿using Domain.Models;
+using Web.Models;
 
 namespace Web.Services.Interfaces
 {
@@ -6,7 +7,7 @@ namespace Web.Services.Interfaces
     {
         public string SessionKey { get; set; }
 
-        public CartViewModel AddToCart(Guid productId, string productName, decimal price, HttpContext context);
+        public CartViewModel AddToCart(CartItem item, HttpContext context);
         public CartViewModel UpdateCart(Guid productId, int quantity, HttpContext context);
         public CartViewModel GetCart(HttpContext context);
 

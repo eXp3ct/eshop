@@ -9,10 +9,10 @@ namespace Web.Services
     {
         public string SessionKey { get; set; } = string.Empty;
 
-        public CartViewModel AddToCart(Guid productId, string productName, decimal price, HttpContext context)
+        public CartViewModel AddToCart(CartItem item, HttpContext context)
         {
             var cart = GetCart(context);
-            var cartItem = cart.Items.FirstOrDefault(i => i.ProductId == productId);
+            var cartItem = cart.Items.FirstOrDefault(i => i.ProductId == item.ProductId);
 
             if (cartItem != null)
             {
@@ -20,13 +20,8 @@ namespace Web.Services
             }
             else
             {
-                cart.Items.Add(new CartItem
-                {
-                    ProductId = productId,
-                    ProductName = productName,
-                    Price = price,
-                    Quantity = 1
-                });
+                item.Quantity = 1;
+                cart.Items.Add(item);
             }
             SaveToCart(cart, context);
             return cart;

@@ -24,7 +24,7 @@ namespace Web.Services
             _productsImageRepository = productsImageRepository;
         }
 
-        public async Task<bool> CreateCategory(string categoryName, Guid parentCategoryId, CancellationToken cancellationToken)
+        public async Task<bool> CreateCategory(string categoryName, Guid? parentCategoryId, CancellationToken cancellationToken)
         {
             if (!string.IsNullOrWhiteSpace(categoryName))
             {

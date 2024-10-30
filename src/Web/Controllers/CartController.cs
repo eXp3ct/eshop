@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Domain.Models;
+using Microsoft.AspNetCore.Mvc;
 using Web.Services.Interfaces;
 
 namespace Web.Controllers
@@ -22,9 +23,9 @@ namespace Web.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddToCart(Guid productId, string productName, decimal price)
+        public IActionResult AddToCart(CartItem item)
         {
-            _cartService.AddToCart(productId, productName, price, HttpContext);
+            _cartService.AddToCart(item, HttpContext);
             return RedirectToAction("Index", "Home");
         }
 

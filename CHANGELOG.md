@@ -1,10 +1,8 @@
-## [1.5.0.0] - 2024-10-23
-### Added
-- New services for admin, home and cart controllers
+## [1.5.1.0] - 2024-10-23
 
 ### Fixed
-- Updating products, was throwing error while saving new product
+- Adding category without parent
 
 
 ### Improved
-- Refactoring code, split logic to different services
+- Add to cart method now uses entity, insead of many parameters
